@@ -1,6 +1,6 @@
-name: Beepboop Starterbot
-description: A simple Python bot sample for Beep Boop
-avatar: resources/avatar.png
+name: Trading Post
+description: A simple MtG Python-based Slack bot made to be Beep Boop hostable.
+avatar: resources/mtg-trading-post.png
 background: resources/background.png
 config:
   - name: LOG_LEVEL
