@@ -1,6 +1,6 @@
 name: Trading Post
 description: A simple MtG Python-based Slack bot made to be Beep Boop hostable.
-avatar: resources/mtg-trading-post.png
+avatar: resources/avatar.jpg
 background: resources/background.png
 config:
   - name: LOG_LEVEL
