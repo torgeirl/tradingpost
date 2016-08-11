@@ -4,6 +4,51 @@ import random
 logger = logging.getLogger(__name__)
 
 
+def getPlaneswalker(dciNumber):
+    url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
+    headers = {
+        'Pragma': 'no-cache',
+        'Origin': 'http://www.wizards.com',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6,sv;q=0.4',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Accept': '*/*',
+        'Cache-Control': 'no-cache',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Cookie': 'f5_cspm=1234; BIGipServerWWWPWPPOOL01=353569034.20480.0000; __utmt=1; BIGipServerWWWPool1=3792701706.20480.0000; PlaneswalkerPointsSettings=0=0&lastviewed=9212399887; __utma=75931667.1475261136.1456488297.1456488297.1456488297.1; __utmb=75931667.5.10.1456488297; __utmc=75931667; __utmz=75931667.1456488297.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)',
+        'Connection': 'keep-alive',
+        'Referer': 'http://www.wizards.com/Magic/PlaneswalkerPoints/%s' % dciNumber
+    }
+    data = {"Parameters":{"DCINumber":dciNumber,"SelectedType":"Yearly"}}
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    seasons = []
+
+    responseData = json.loads(response.content)
+    markup = responseData["ModalContent"]
+    searchPosition = markup.find("SeasonRange")
+
+    while searchPosition != -1:
+        pointsvalue = "PointsValue\">"
+        searchPosition = markup.find(pointsvalue, searchPosition)
+        searchPosition += len(pointsvalue)
+        endPosition = markup.find("</div>", searchPosition)
+        if endPosition != -1:
+            value = markup[searchPosition:endPosition]
+            seasons.append(int(value))
+        searchPosition = markup.find("SeasonRange", searchPosition)
+
+    return {"currentSeason": seasons[0], "lastSeason": seasons[1]}
+
+def getPlaneswalkerByes(player):
+    if player["currentSeason"] >= 2250 or player["lastSeason"] >= 2250:
+        return 2
+    elif player["currentSeason"] >= 1300 or player["lastSeason"] >= 1300:
+        return 1
+
+    return 0
+
 class Messenger(object):
     def __init__(self, slack_clients):
         self.clients = slack_clients
@@ -42,20 +87,36 @@ class Messenger(object):
         answer = "To eat the chicken on the other side! :laughing:"
         self.send_message(channel_id, answer)
 
-
     def write_error(self, channel_id, err_msg):
         txt = ":face_with_head_bandage: my maker didn't handle this error very well:\n>```{}```".format(err_msg)
         self.send_message(channel_id, txt)
 
-    def demo_attachment(self, channel_id):
-        txt = "Beep Beep Boop is a ridiculously simple hosting platform for your Slackbots."
-        attachment = {
-            "pretext": "We bring bots to life. :sunglasses: :thumbsup:",
-            "title": "Host, deploy and share your bot in seconds.",
-            "title_link": "https://beepboophq.com/",
-            "text": txt,
-            "fallback": txt,
-            "image_url": "https://storage.googleapis.com/beepboophq/_assets/bot-1.22f6fb.png",
-            "color": "#7CD197",
-        }
-        self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
+    def write_card(self, channel_id, msg_txt):
+        txt = ''
+        self.send_message(channel_id, txt)
+        #TODO
+
+    def write_oracle(self, channel_id, msg_txt):
+        txt = ''
+        self.send_message(channel_id, txt)
+        #TODO
+
+    def write_price(self, channel_id, msg_txt):
+        txt = ''
+        self.send_message(channel_id, txt)
+        #TODO
+
+    def write_pwp(self, channel_id, msg_txt):
+        dcinr = msg_txt[len('!pwp'):]
+	planeswalker = getPlaneswalker(dcinr)
+        if planeswalker > -1:
+	        txt = "DCI# %s has %s point(s) in the current season, %s point(s) last season.\nCurrently " % (dcinr, planeswalker["currentSeason"], planeswalker["lastSeason"])
+	        byes = getPlaneswalkerByes(planeswalker)
+	        if not byes:
+		        txt += "not eligible for GP byes."
+	        else:
+		        txt += "eligible for %d GP bye(s)." % byes
+        else:
+                txt = "DCI# %s not found." % dcinr
+        self.send_message(channel_id, txt)
+

@@ -2,7 +2,7 @@ tradingpost
 =============
 
 ## Overview
-A simple Magic: the Gathering Python-based Slack bot made to be [Beep Boop](https://beepboophq.com) hostable.
+A simple Magic: the Gathering bot, implemented to be a Beep Boop hostable, Python-based Slack bot.
 
 ## Assumptions
 * You have already signed up with Beep Boop and have a local fork of this project.
@@ -30,18 +30,10 @@ If you want change the logging level, prepend `export LOG_LEVEL=<your level>; ` 
 If you have linked your local repo with the Beep Boop service (check [here](https://beepboophq.com/0_o/my-projects)), changes pushed to the remote master branch will automatically deploy.
 
 
-## Code Organization
-If you want to add or change an event that the bot responds (e.g. when the bot is mentioned, when the bot joins a channel, when a user types a message, etc.), you can modify the `_handle_by_type` method in `event_handler.py`.
+## Credits
+I got the inspiration to make Tradingpost after seeing Filip Söderholm's [cardfetcher bot](https://github.com/fiso/cardfetcher) in action, and I have re-used part of his code and the emojis recource while making Tradingpost.
 
-If you want to change the responses, then you can modify the `messenger.py` class, and make the corresponding invocation in `event_handler.py`.
-
-The `slack_clients.py` module provides a facade of two different Slack API clients which can be enriched to access data from Slack that is needed by your Bot:
-
-1. [slackclient](https://github.com/slackhq/python-slackclient) - Realtime Messaging (RTM) API to Slack via a websocket connection.
-2. [slacker](https://github.com/os/slacker) - Web API to Slack via RESTful methods.
-
-The `slack_bot.py` module implements and interface that is needed to run a multi-team bot using the Beep Boop Resource API client, by implementing an interface that includes `start()` and `stop()` methods and a function that spawns new instances of your bot: `spawn_bot`.  It is the main run loop of your bot instance that will listen to a particular Slack team's RTM events, and dispatch them to the `event_handler`.
+The [BeepBoop](https://beepboophq.com/docs/article/overview) bot design of this project is heavily inspired by [BeepBoopHQ's Starter Python bot](https://github.com/BeepBoopHQ/starter-python-bot/) (MIT license).
 
 ## License
-
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
