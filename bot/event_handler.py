@@ -56,7 +56,7 @@ class RtmEventHandler(object):
                     self.msg_writer.write_oracle(event['channel'], msg_txt)
                 elif msg_txt.startswith('!price'):
                     self.msg_writer.write_price(event['channel'], msg_txt)
-                else msg_txt.startswith('!pwp '):
+                elif msg_txt.startswith('!pwp '):
                     self.msg_writer.write_pwp(event['channel'], msg_txt[5:])
             else:
                 pass
