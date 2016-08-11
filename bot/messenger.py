@@ -106,8 +106,7 @@ class Messenger(object):
         self.send_message(channel_id, txt)
         #TODO
 
-    def write_pwp(self, channel_id, msg_txt):
-        dcinr = msg_txt[len('!pwp'):]
+    def write_pwp(self, channel_id, dcinr):
 	planeswalker = getPlaneswalker(dcinr)
         if planeswalker > -1:
 	        txt = "DCI# %s has %s point(s) in the current season, %s point(s) last season.\nCurrently " % (dcinr, planeswalker["currentSeason"], planeswalker["lastSeason"])
