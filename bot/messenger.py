@@ -112,7 +112,7 @@ class Messenger(object):
     def write_pwp(self, channel_id, dciNumber):
         planeswalker = getSeasons(dciNumber)
 
-        if planeswalker not None:
+        if not planeswalker == None:
             txt = "DCI# %s has %s points in the current season, and %s points last season.\nCurrently " % (dciNumber, planeswalker["currentSeason"], planeswalker["lastSeason"])
 
             if planeswalker["currentSeason"] >= 2250 or planeswalker["lastSeason"] >= 2250:
