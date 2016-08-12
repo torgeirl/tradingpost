@@ -6,6 +6,49 @@ import requests
 logger = logging.getLogger(__name__)
 
 
+def getSeasons(dciNumber):
+    url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
+    headers = {
+        'Pragma': 'no-cache',
+        'Origin': 'http://www.wizards.com',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6,sv;q=0.4',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Accept': '*/*',
+        'Cache-Control': 'no-cache',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Cookie': 'f5_cspm=1234; BIGipServerWWWPWPPOOL01=353569034.20480.0000; __utmt=1; BIGipServerWWWPool1=3792701706.20480.0000; PlaneswalkerPointsSettings=0=0&lastviewed=9212399887; __utma=75931667.1475261136.1456488297.1456488297.1456488297.1; __utmb=75931667.5.10.1456488297; __utmc=75931667; __utmz=75931667.1456488297.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)',
+        'Connection': 'keep-alive',
+        'Referer': 'http://www.wizards.com/Magic/PlaneswalkerPoints/%s' % dciNumber
+    }
+    data = {"Parameters":{"DCINumber":dciNumber,"SelectedType":"Yearly"}}
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    if response.status_code is 200:
+        seasons = []
+
+        responseData = json.loads(response.content)
+        markup = responseData["ModalContent"]
+        searchPosition = markup.find("SeasonRange")
+
+        while searchPosition != -1:
+            pointsvalue = "PointsValue\">"
+            searchPosition = markup.find(pointsvalue, searchPosition)
+            searchPosition += len(pointsvalue)
+            endPosition = markup.find("</div>", searchPosition)
+            if endPosition != -1:
+                value = markup[searchPosition:endPosition]
+                seasons.append(int(value))
+            searchPosition = markup.find("SeasonRange", searchPosition)
+
+        return {"currentSeason": seasons[0], "lastSeason": seasons[1]}
+    else:
+        return None
+
+
+
+
 class Messenger(object):
     def __init__(self, slack_clients):
         self.clients = slack_clients
@@ -22,9 +65,12 @@ class Messenger(object):
         bot_uid = self.clients.bot_user_id()
         txt = '{}\n{}\n{}\n{}'.format(
             "I'm your friendly Slack bot written in Python.  I'll *_respond_* to the following commands:",
-            "> `hi <@" + bot_uid + ">` - I'll respond with a randomized greeting mentioning your user. :wave:",
+            "> `hi <@" + bot_uid + ">` - I'll respond with a randomized greeting mentioning your username. :wave:",
             "> `<@" + bot_uid + "> joke` - I'll tell you one of my finest jokes, with a typing pause for effect. :laughing:",
-            "> `<@" + bot_uid + "> attachment` - I'll demo a post with an attachment using the Web API. :paperclip:")
+            "> `!card cardname` - I'll post a picture of the named card. :frame_with_picture:",
+            "> `!price cardname` - I'll respond with the card's current market price. :moneybag:",
+            "> `!oracle cardname` - I'll respond with the card's oracle text. :book:",
+            "> `!pwp dcinumber` - I'll tell you a player's PWP score and bye eligibility. :trophy:")
         self.send_message(channel_id, txt)
 
     def write_greeting(self, channel_id, user_id):
@@ -64,43 +110,9 @@ class Messenger(object):
         #TODO
 
     def write_pwp(self, channel_id, dciNumber):
-        url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
-        headers = {
-            'Pragma': 'no-cache',
-            'Origin': 'http://www.wizards.com',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'en-US,en;q=0.8,de;q=0.6,sv;q=0.4',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept': '*/*',
-            'Cache-Control': 'no-cache',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Cookie': 'f5_cspm=1234; BIGipServerWWWPWPPOOL01=353569034.20480.0000; __utmt=1; BIGipServerWWWPool1=3792701706.20480.0000; PlaneswalkerPointsSettings=0=0&lastviewed=9212399887; __utma=75931667.1475261136.1456488297.1456488297.1456488297.1; __utmb=75931667.5.10.1456488297; __utmc=75931667; __utmz=75931667.1456488297.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)',
-            'Connection': 'keep-alive',
-            'Referer': 'http://www.wizards.com/Magic/PlaneswalkerPoints/%s' % dciNumber
-        }
-        data = {"Parameters":{"DCINumber":dciNumber,"SelectedType":"Yearly"}}
-        response = requests.post(url, headers=headers, data=json.dumps(data))
+        planeswalker = getSeasons(dciNumber)
 
-        if response.status_code is 200:
-            seasons = []
-
-            responseData = json.loads(response.content)
-            markup = responseData["ModalContent"]
-            searchPosition = markup.find("SeasonRange")
-
-            while searchPosition != -1:
-                pointsvalue = "PointsValue\">"
-                searchPosition = markup.find(pointsvalue, searchPosition)
-                searchPosition += len(pointsvalue)
-                endPosition = markup.find("</div>", searchPosition)
-                if endPosition != -1:
-                    value = markup[searchPosition:endPosition]
-                    seasons.append(int(value))
-                searchPosition = markup.find("SeasonRange", searchPosition)
-
-            planeswalker = {"currentSeason": seasons[0], "lastSeason": seasons[1]}
-
+        if planeswalker not None:
             txt = "DCI# %s has %s points in the current season, and %s points last season.\nCurrently " % (dciNumber, planeswalker["currentSeason"], planeswalker["lastSeason"])
 
             if planeswalker["currentSeason"] >= 2250 or planeswalker["lastSeason"] >= 2250:
