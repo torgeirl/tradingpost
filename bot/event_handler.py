@@ -16,7 +16,7 @@ class RtmEventHandler(object):
             self._handle_by_type(event['type'], event)
 
     def _handle_by_type(self, event_type, event):
-        # See https://api.slack.com/rtm for a full list of events
+        # see https://api.slack.com/rtm for a full list of events
         if event_type == 'error':
             # error
             self.msg_writer.write_error(event['channel'], json.dumps(event))
@@ -33,7 +33,7 @@ class RtmEventHandler(object):
             pass
 
     def _handle_message(self, event):
-        # Filter out messages from the bot itself
+        # filter out messages from the bot itself
         if not self.clients.is_message_from_me(event['user']):
 
             msg_txt = event['text']
@@ -49,12 +49,12 @@ class RtmEventHandler(object):
                 else:
                     self.msg_writer.write_prompt(event['channel'])
             elif re.search('!card|!oracle|!price|!pwp', msg_txt):
-                if msg_txt.startswith('!card'):
-                    self.msg_writer.write_card(event['channel'], msg_txt)
-                elif msg_txt.startswith('!oracle'):
-                    self.msg_writer.write_oracle(event['channel'], msg_txt)
-                elif msg_txt.startswith('!price'):
-                    self.msg_writer.write_price(event['channel'], msg_txt)
+                if msg_txt.startswith('!card '):
+                    self.msg_writer.write_card(event['channel'], msg_txt[6:])
+                elif msg_txt.startswith('!oracle '):
+                    self.msg_writer.write_oracle(event['channel'], msg_txt[8:])
+                elif msg_txt.startswith('!price '):
+                    self.msg_writer.write_price(event['channel'], msg_txt[7:])
                 elif msg_txt.startswith('!pwp '):
                     self.msg_writer.write_pwp(event['channel'], msg_txt[5:])
             else:
