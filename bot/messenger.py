@@ -25,23 +25,26 @@ def getPlaneswalker(dciNumber):
     data = {"Parameters":{"DCINumber":dciNumber,"SelectedType":"Yearly"}}
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
-    seasons = []
+    if response.status_code is 200:
+        seasons = []
 
-    responseData = json.loads(response.content)
-    markup = responseData["ModalContent"]
-    searchPosition = markup.find("SeasonRange")
+        responseData = json.loads(response.content)
+        markup = responseData["ModalContent"]
+        searchPosition = markup.find("SeasonRange")
 
-    while searchPosition != -1:
-        pointsvalue = "PointsValue\">"
-        searchPosition = markup.find(pointsvalue, searchPosition)
-        searchPosition += len(pointsvalue)
-        endPosition = markup.find("</div>", searchPosition)
-        if endPosition != -1:
-            value = markup[searchPosition:endPosition]
-            seasons.append(int(value))
-        searchPosition = markup.find("SeasonRange", searchPosition)
+        while searchPosition != -1:
+            pointsvalue = "PointsValue\">"
+            searchPosition = markup.find(pointsvalue, searchPosition)
+            searchPosition += len(pointsvalue)
+            endPosition = markup.find("</div>", searchPosition)
+            if endPosition != -1:
+                value = markup[searchPosition:endPosition]
+                seasons.append(int(value))
+            searchPosition = markup.find("SeasonRange", searchPosition)
 
-    return {"currentSeason": seasons[0], "lastSeason": seasons[1]}
+        return {"currentSeason": seasons[0], "lastSeason": seasons[1]}
+    else:
+        return None
 
 def getPlaneswalkerByes(player):
     if player["currentSeason"] >= 2250 or player["lastSeason"] >= 2250:
@@ -110,7 +113,7 @@ class Messenger(object):
 
     def write_pwp(self, channel_id, dcinr):
 	planeswalker = getPlaneswalker(dcinr)
-        if planeswalker > -1:
+        if planeswalker is not None:
 	        txt = "DCI# %s has %s point(s) in the current season, %s point(s) last season.\nCurrently " % (dcinr, planeswalker["currentSeason"], planeswalker["lastSeason"])
 	        byes = getPlaneswalkerByes(planeswalker)
 	        if not byes:

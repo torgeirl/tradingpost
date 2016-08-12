@@ -48,8 +48,7 @@ class RtmEventHandler(object):
                     self.msg_writer.write_joke(event['channel'])
                 else:
                     self.msg_writer.write_prompt(event['channel'])
-
-            if re.search('!card|!oracle|!price|!pwp', msg_txt):
+            elif re.search('!card|!oracle|!price|!pwp', msg_txt):
                 if msg_txt.startswith('!card'):
                     self.msg_writer.write_card(event['channel'], msg_txt)
                 elif msg_txt.startswith('!oracle'):
