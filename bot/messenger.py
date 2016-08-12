@@ -105,7 +105,7 @@ class Messenger(object):
 
             if planeswalker["currentSeason"] >= 2250 or planeswalker["lastSeason"] >= 2250:
                 txt += "eligible for 2 GP byes."
-            elif player["currentSeason"] >= 1300 or player["lastSeason"] >= 1300:
+            elif planeswalker["currentSeason"] >= 1300 or planeswalker["lastSeason"] >= 1300:
                 txt += "eligible for 1 GP bye."
             else:
                 txt += "not eligible for GP byes."
