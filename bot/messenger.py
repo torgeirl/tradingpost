@@ -95,17 +95,17 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def write_card(self, channel_id, msg_txt):
-        txt = ''
+        txt = 'Sorry, my maker has yet to impliment this function. :construction: '
         self.send_message(channel_id, txt)
         #TODO
 
     def write_oracle(self, channel_id, msg_txt):
-        txt = ''
+        txt = 'Sorry, my maker has yet to impliment this function. :construction: '
         self.send_message(channel_id, txt)
         #TODO
 
     def write_price(self, channel_id, msg_txt):
-        txt = ''
+        txt = 'Sorry, my maker has yet to impliment this function. :construction: '
         self.send_message(channel_id, txt)
         #TODO
 
