@@ -165,7 +165,7 @@ class Messenger(object):
                     typeline += "- "
             if card.has_key("subtypes"):
                 for subtype in card["subtypes"]:
-                typeline += subtype.capitalize() + " "
+                    typeline += subtype.capitalize() + " "
             txt = "%s (%s)\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"])
 			if card.has_key("power") and card.has_key("toughness"):
                 txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
