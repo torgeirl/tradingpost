@@ -147,6 +147,7 @@ class Messenger(object):
 
     def write_card(self, channel_id, searchTerm):
         txt = 'Sorry, my maker has yet to impliment this function. :construction: '
+        logger.debug(card)
         self.send_message(channel_id, txt)
         #TODO
 
@@ -166,7 +167,7 @@ class Messenger(object):
             if card.has_key("subtypes"):
                 for subtype in card["subtypes"]:
                     typeline += subtype.capitalize() + " "
-            txt = "%s (%s)\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"])
+            txt = "%s %s\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"])
             if card.has_key("power") and card.has_key("toughness"):
                 txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
         else:
