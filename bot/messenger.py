@@ -162,7 +162,7 @@ class Messenger(object):
 				for cardtype in card["types"]:
 					typeline += cardtype.capitalize() + " "
 				if card.has_key("subtypes"):
-					typeline += "— "
+					typeline += "- "
 			if card.has_key("subtypes"):
 				for subtype in card["subtypes"]:
 					typeline += subtype.capitalize() + " "
