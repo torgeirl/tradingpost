@@ -147,7 +147,6 @@ class Messenger(object):
 
     def write_card(self, channel_id, searchTerm):
         txt = 'Sorry, my maker has yet to impliment this function. :construction: '
-        logger.debug(card)
         self.send_message(channel_id, txt)
         #TODO
 
@@ -155,6 +154,7 @@ class Messenger(object):
         card = getCard(searchTerm)
 
         if card:
+            logger.debug(card) #TODO: remove this debug
             typeline = ""
             if card.has_key("supertypes"):
                 for supertype in card["supertypes"]:
