@@ -6,6 +6,58 @@ import requests
 logger = logging.getLogger(__name__)
 
 
+def findIndexOfSequence(data, sequence, startIndex = 0):
+	index = startIndex
+	for token in sequence:
+		index = data.find(token, index)
+		if index == -1:
+			return -1
+	return index + len(sequence[-1])
+
+def getCardValue(cardName, setCode):
+	url = "http://www.mtggoldfish.com/widgets/autocard/%s [%s]" % (cardName, setCode)
+	headers = {
+		'Pragma': 'no-cache',
+		'Accept-Encoding': 'gzip, deflate, sdch',
+		'Accept-Language': 'en-US,en;q=0.8,de;q=0.6,sv;q=0.4',
+		'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36',
+		'Accept': 'text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01',
+		'Referer': 'http://www.mtggoldfish.com/widgets/autocard/%s' % cardName,
+		'X-Requested-With': 'XMLHttpRequest',
+		'Connection': 'keep-alive',
+		'Cache-Control': 'no-cache'
+	}
+	response = requests.get(url, headers=headers)
+	index = findIndexOfSequence(response.content, ["tcgplayer", "btn-shop-price", "$"])
+	endIndex = response.content.find("\\n", index)
+	try:
+		value = float(response.content[index+2:endIndex].replace(",", ""))
+	except ValueError:
+		value = 0
+
+	return value
+
+def getCard(name):
+	queryUrl = "http://api.deckbrew.com/mtg/cards?name=%s" % name
+	print queryUrl
+	r = requests.get(queryUrl)
+	cards = r.json()
+
+	if len(cards) < 1:
+		return None
+
+	card = cards[0]
+	bestMatch = None
+	for cardIter in cards:
+		pos = cardIter["name"].lower().find(name)
+		if bestMatch is None or (pos != -1 and pos < bestMatch):
+			bestMatch = pos
+			card = cardIter
+
+	mostRecent = card["editions"][0]
+	card["value"] = getCardValue(card["name"], mostRecent["set_id"])
+	return card
+
 def getSeasons(dciNumber):
     url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
     headers = {
@@ -45,8 +97,6 @@ def getSeasons(dciNumber):
         return {"currentSeason": seasons[0], "lastSeason": seasons[1]}
     else:
         return None
-
-
 
 
 class Messenger(object):
@@ -105,15 +155,21 @@ class Messenger(object):
         self.send_message(channel_id, txt)
         #TODO
 
-    def write_price(self, channel_id, msg_txt):
-        txt = 'Sorry, my maker has yet to impliment this function. :construction: '
+    def write_price(self, channel_id, searchTerm):
+        card = getCard(searchTerm)
+        if card:
+            mostRecentPrinting = card["editions"][0]
+            txt = "Unable to find price information for %s" % card["name"]
+            if card["value"] > 0:
+                txt = "Current market price for most recent printing of %s (%s) - $%.1f" % (card["name"], mostRecentPrinting["set"], card["value"])
+        else:
+            txt = 'Card not found'
         self.send_message(channel_id, txt)
-        #TODO
 
     def write_pwp(self, channel_id, dciNumber):
         planeswalker = getSeasons(dciNumber)
 
-        if not planeswalker == None:
+        if planeswalker:
             txt = "DCI# %s has %s points in the current season, and %s points last season.\nCurrently " % (dciNumber, planeswalker["currentSeason"], planeswalker["lastSeason"])
 
             if planeswalker["currentSeason"] >= 2250 or planeswalker["lastSeason"] >= 2250:

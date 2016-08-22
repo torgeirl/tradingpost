@@ -11,7 +11,6 @@ class RtmEventHandler(object):
         self.msg_writer = msg_writer
 
     def handle(self, event):
-
         if 'type' in event:
             self._handle_by_type(event['type'], event)
 
