@@ -58,20 +58,6 @@ def getCard(name):
 	card["value"] = getCardValue(card["name"], mostRecent["set_id"])
 	return card
 
-def emojiFilter(input):
-	ret = input.replace("{", ":_")
-	ret = ret.replace("}", "_:")
-	lastpos = None
-	while ret.rfind(":_", 0, lastpos) != -1:
-		lastpos = ret.rfind(":_", 0, lastpos)
-		start = lastpos + 2
-		end = ret.rfind("_:")
-		content = ret[start:end]
-		content = content.lower()
-		content = content.replace("/", "")
-		ret = ret[:start] + content + ret[end:]
-	return ret
-
 def getSeasons(dciNumber):
     url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
     headers = {
@@ -168,7 +154,6 @@ class Messenger(object):
         card = getCard(searchTerm)
 
         if card:
-			mostRecentPrinting = card["editions"][0]
 			typeline = ""
 			if card.has_key("supertypes"):
 				for supertype in card["supertypes"]:
@@ -181,15 +166,9 @@ class Messenger(object):
 			if card.has_key("subtypes"):
 				for subtype in card["subtypes"]:
 					typeline += subtype.capitalize() + " "
-
-            txt = "%s\t\t%s\n%s\n%s" % (card["name"], emojiFilter(card["cost"]), typeline, emojiFilter(card["text"]))
-			valueinfo = ""
+            txt = "%s\t(%s)\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"])
 			if card.has_key("power") and card.has_key("toughness"):
 				txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
-			if card["value"] > 0:
-				valueinfo = "\n\nCurrent market price for most recent printing (%s) - $%.1f" % (mostRecentPrinting["set"], card["value"])
-
-			txt += valueinfo
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
