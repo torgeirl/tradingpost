@@ -154,21 +154,21 @@ class Messenger(object):
         card = getCard(searchTerm)
 
         if card:
-			typeline = ""
-			if card.has_key("supertypes"):
-				for supertype in card["supertypes"]:
-					typeline += supertype.capitalize() + " "
-			if card.has_key("types"):
-				for cardtype in card["types"]:
-					typeline += cardtype.capitalize() + " "
-				if card.has_key("subtypes"):
-					typeline += "- "
-			if card.has_key("subtypes"):
-				for subtype in card["subtypes"]:
-					typeline += subtype.capitalize() + " "
+            typeline = ""
+            if card.has_key("supertypes"):
+                for supertype in card["supertypes"]:
+                    typeline += supertype.capitalize() + " "
+            if card.has_key("types"):
+                for cardtype in card["types"]:
+                    typeline += cardtype.capitalize() + " "
+                if card.has_key("subtypes"):
+                    typeline += "- "
+            if card.has_key("subtypes"):
+                for subtype in card["subtypes"]:
+                typeline += subtype.capitalize() + " "
             txt = "%s (%s)\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"])
 			if card.has_key("power") and card.has_key("toughness"):
-				txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
+                txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
