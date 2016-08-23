@@ -150,10 +150,11 @@ class Messenger(object):
 
         if card:
             mostRecentPrinting = card["editions"][0]
-            txt = "%s (%s)" % (card["name"], mostRecentPrinting)
+            txt = ""
             attachment = {
                 "title": card["name"].replace("\"", "\\\""),
                 "image_url": mostRecentPrinting["image_url"],
+                "footer": "%s (%s)" % (card["name"], mostRecentPrinting["set_id"])
             }
             self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
         else:
