@@ -180,9 +180,11 @@ class Messenger(object):
             if "subtypes" in card:
                 for subtype in card["subtypes"]:
                     typeline += subtype.capitalize() + " "
-            txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"])
+            txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace('\u2212', '-'))
             if "power" in card and "toughness" in card:
                 txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
+            if "loyalty" in card:
+                txt += "\n*`%s`*" % card["loyalty"]
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
