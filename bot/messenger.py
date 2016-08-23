@@ -138,7 +138,7 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def write_joke(self, channel_id):
-        with open('jokes.txt', 'r') as infile:
+        with open('/src/bot/jokes.txt', 'r') as infile:
             joke = random.choice(list(infile))
         setup, punchline = joke.split('|')
         self.send_message(channel_id, setup.strip())
