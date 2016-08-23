@@ -149,16 +149,16 @@ class Messenger(object):
         card = getCard(searchTerm)
 
         if card:
-        #TODO: remove debugging
-            txt = ""
-            for x in card:
-                txt += "%s\n" % (x)
-                for y in card[x]:
-                    txt += "%s : %s\n" % (y, card[x][y])
+            mostRecentPrinting = card["editions"][0]
+            txt = "%s (%s)" % (card["name"], mostRecentPrinting)
+            attachment = {
+                "title": card["name"].replace("\"", "\\\"")),
+                "image_url": mostRecentPrinting["image_url"],
+            }
+            self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
         else:
             txt = 'Card not found.'
-        self.send_message(channel_id, txt)
-        #TODO
+            self.send_message(channel_id, txt)
 
     def write_oracle(self, channel_id, searchTerm):
         card = getCard(searchTerm)
