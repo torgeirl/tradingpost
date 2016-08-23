@@ -152,7 +152,7 @@ class Messenger(object):
             mostRecentPrinting = card["editions"][0]
             txt = "%s (%s)" % (card["name"], mostRecentPrinting)
             attachment = {
-                "title": card["name"].replace("\"", "\\\"")),
+                "title": card["name"].replace("\"", "\\\""),
                 "image_url": mostRecentPrinting["image_url"],
             }
             self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
