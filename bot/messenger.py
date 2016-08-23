@@ -152,9 +152,9 @@ class Messenger(object):
         #TODO: remove debugging
             txt = ""
             for x in card:
-                txt += "%s" % (x)
+                txt += "%s\n" % (x)
                 for y in card[x]:
-                    txt += "%s : " % (y, card[x][y])
+                    txt += "%s : %s\n" % (y, card[x][y])
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
