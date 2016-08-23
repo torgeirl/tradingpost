@@ -154,7 +154,7 @@ class Messenger(object):
             attachment = {
                 "title": card["name"].replace("\"", "\\\""),
                 "image_url": mostRecentPrinting["image_url"],
-                "footer": "%s (%s)" % (card["name"], mostRecentPrinting["set_id"])
+                "footer": "%s (%s)" % (mostRecentPrinting["set"], mostRecentPrinting["set_id"]),
             }
             self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
         else:
@@ -177,7 +177,7 @@ class Messenger(object):
             if card.has_key("subtypes"):
                 for subtype in card["subtypes"]:
                     typeline += subtype.capitalize() + " "
-            txt = "%s %s\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"])
+            txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"])
             if card.has_key("power") and card.has_key("toughness"):
                 txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
         else:
