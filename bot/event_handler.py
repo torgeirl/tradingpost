@@ -33,7 +33,7 @@ class RtmEventHandler(object):
 
     def _handle_message(self, event):
         # filter out messages from the bot itself
-        if not self.clients.is_message_from_me(event['user']):
+        if 'user' in event and not self.clients.is_message_from_me(event['user']):
 
             msg_txt = event['text']
 
