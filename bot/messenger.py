@@ -194,8 +194,8 @@ class Messenger(object):
             mostRecentPrinting = card["editions"][0]
             txt = "Unable to find price information for %s" % card["name"]
             if card["value"] > 0:
-                txt = "Current market price for most recent printing of %s (%s) - $%.1f" % (
-                card["name"], mostRecentPrinting["set"], card["value"])
+                txt = ("Current market price for most recent printing of %s (%s) - $%.1f" %
+                       (card["name"], mostRecentPrinting["set"], card["value"]))
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
@@ -204,8 +204,8 @@ class Messenger(object):
         planeswalker = getSeasons(dciNumber)
 
         if planeswalker:
-            txt = "DCI# %s has %s points in the current season, and %s points last season.\nCurrently " % (
-            dciNumber, planeswalker["currentSeason"], planeswalker["lastSeason"])
+            txt = ("DCI# %s has %s points in the current season, and %s points last season.\nCurrently "
+                   % (dciNumber, planeswalker["currentSeason"], planeswalker["lastSeason"]))
 
             if planeswalker["currentSeason"] >= 2250 or planeswalker["lastSeason"] >= 2250:
                 txt += "eligible for 2 GP byes."
