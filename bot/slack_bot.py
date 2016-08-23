@@ -53,7 +53,7 @@ class SlackBot(object):
                         event_handler.handle(event)
                     except:
                         err_msg = traceback.format_exc()
-                        logging.error('Unexpected error: {}'.format(err_msg))
+                        logging.error(u'Unexpected error: {}'.format(err_msg))
                         msg_writer.write_error(event['channel'], err_msg)
                         continue
 
@@ -61,7 +61,7 @@ class SlackBot(object):
                 time.sleep(.1)
 
         else:
-            logger.error('Failed to connect to RTM client with token: {}'.format(self.clients.token))
+            logger.error(u'Failed to connect to RTM client with token: {}'.format(self.clients.token))
 
     def _auto_ping(self):
         # hard code the interval to 3 seconds
