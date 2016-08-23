@@ -138,11 +138,12 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def write_joke(self, channel_id):
-        question = "Why did the python cross the road?"
-        self.send_message(channel_id, question)
+        with open('jokes.txt', 'r') as infile:
+            joke = random.choice(list(infile))
+        setup, punchline = joke.split('|')
+        self.send_message(channel_id, setup.strip())
         self.clients.send_user_typing_pause(channel_id)
-        answer = "To eat the chicken on the other side! :laughing:"
-        self.send_message(channel_id, answer)
+        self.send_message(channel_id, punchline.strip())
 
     def write_error(self, channel_id, err_msg):
         txt = ":face_with_head_bandage: my maker didn't handle this error very well:\n>```{}```".format(err_msg)
