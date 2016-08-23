@@ -180,7 +180,7 @@ class Messenger(object):
             if "subtypes" in card:
                 for subtype in card["subtypes"]:
                     typeline += subtype.capitalize() + " "
-            txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace('\u2212', '-'))
+            txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace(u'\u2212', '-'))
             if "power" in card and "toughness" in card:
                 txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
             if "loyalty" in card:
