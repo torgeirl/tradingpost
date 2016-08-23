@@ -31,7 +31,7 @@ If you have linked your local repo with the Beep Boop service (check [here](http
 
 
 ## Credits
-I got the inspiration to make Tradingpost after seeing Filip Söderholm's [cardfetcher bot](https://github.com/fiso/cardfetcher) in action, and I have re-used part of his code and the emojis recource while making Tradingpost.
+I got the inspiration to make Tradingpost after seeing Filip Söderholm's [cardfetcher bot](https://github.com/fiso/cardfetcher) in action, and I have re-used part of his code while making Tradingpost.
 
 The [BeepBoop](https://beepboophq.com/docs/article/overview) bot design of this project is heavily inspired by [BeepBoopHQ's Starter Python bot](https://github.com/BeepBoopHQ/starter-python-bot/) (MIT license).
 
