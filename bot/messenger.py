@@ -146,7 +146,17 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def write_card(self, channel_id, searchTerm):
-        txt = 'Sorry, my maker has yet to impliment this function. :construction: '
+        card = getCard(searchTerm)
+
+        if card:
+        #TODO: remove debugging
+            txt = ""
+            for x in cars:
+                txt += (x)
+                for y in cars[x]:
+                    txt += (y,':',cars[x][y])
+        else:
+            txt = 'Card not found.'
         self.send_message(channel_id, txt)
         #TODO
 
@@ -154,7 +164,6 @@ class Messenger(object):
         card = getCard(searchTerm)
 
         if card:
-            logger.debug(card) #TODO: remove this debug
             typeline = ""
             if card.has_key("supertypes"):
                 for supertype in card["supertypes"]:
@@ -201,3 +210,17 @@ class Messenger(object):
         else:
             txt = "DCI# %s not found." % dciNumber
         self.send_message(channel_id, txt)
+
+    #TODO remove demo
+    def demo_attachment(self, channel_id):
+        txt = "Beep Beep Boop is a ridiculously simple hosting platform for your Slackbots."
+        attachment = {
+            "pretext": "We bring bots to life. :sunglasses: :thumbsup:",
+            "title": "Host, deploy and share your bot in seconds.",
+            "title_link": "https://beepboophq.com/",
+            "text": txt,
+            "fallback": txt,
+            "image_url": "https://storage.googleapis.com/beepboophq/_assets/bot-1.22f6fb.png",
+            "color": "#7CD197",
+        }
+        self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')

@@ -45,6 +45,9 @@ class RtmEventHandler(object):
                     self.msg_writer.write_greeting(event['channel'], event['user'])
                 elif 'joke' in msg_txt:
                     self.msg_writer.write_joke(event['channel'])
+                #TODO remove demo
+                elif 'demo' in msg_txt:
+                    self.demo_attachment(event['channel'])
                 else:
                     self.msg_writer.write_prompt(event['channel'])
             elif re.search('!card|!oracle|!price|!pwp', msg_txt):
