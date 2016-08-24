@@ -138,7 +138,7 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def write_joke(self, channel_id):
-        with open('jokes.json', 'r') as infile:
+        with open('/src/bot/jokes.json', 'r') as infile:
             joke = random.choice(infile)
         self.send_message(channel_id, joke["setup"])
         self.clients.send_user_typing_pause(channel_id)
