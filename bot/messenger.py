@@ -61,27 +61,6 @@ def getCard(name):
     return card
 
 
-def getOracleText(card):
-    typeline = ""
-    if "supertypes" in card:
-        for supertype in card["supertypes"]:
-            typeline += supertype.capitalize() + " "
-    if "types" in card:
-        for cardtype in card["types"]:
-            typeline += cardtype.capitalize() + " "
-        if "subtypes" in card:
-            typeline += "- "
-    if "subtypes" in card:
-        for subtype in card["subtypes"]:
-            typeline += subtype.capitalize() + " "
-    txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace(u'\u2212', '-'))
-    if "power" in card and "toughness" in card:
-        txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
-    if "loyalty" in card:
-        txt += "\n*`%s`*" % card["loyalty"]
-    return txt
-
-
 def getSeasons(dciNumber):
     url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
     headers = {
@@ -189,7 +168,23 @@ class Messenger(object):
         card = getCard(searchTerm)
 
         if card:
-            txt = getOracleText(card)
+            typeline = ""
+            if "supertypes" in card:
+                for supertype in card["supertypes"]:
+                    typeline += supertype.capitalize() + " "
+            if "types" in card:
+                for cardtype in card["types"]:
+                    typeline += cardtype.capitalize() + " "
+                if "subtypes" in card:
+                    typeline += "- "
+            if "subtypes" in card:
+                for subtype in card["subtypes"]:
+                    typeline += subtype.capitalize() + " "
+            txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace(u'\u2212', '-'))
+            if "power" in card and "toughness" in card:
+                txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
+            if "loyalty" in card:
+                txt += "\n*`%s`*" % card["loyalty"]
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
