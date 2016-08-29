@@ -15,6 +15,21 @@ def findIndexOfSequence(data, sequence, startIndex=0):
     return index + len(sequence[-1])
 
 
+def emojiFilter(input):
+	ret = input.replace("{", ":_")
+	ret = ret.replace("}", "_:")
+	lastpos = None
+	while ret.rfind(":_", 0, lastpos) != -1:
+		lastpos = ret.rfind(":_", 0, lastpos)
+		start = lastpos + 2
+		end = ret.rfind("_:")
+		content = ret[start:end]
+		content = content.lower()
+		content = content.replace("/", "")
+		ret = ret[:start] + content + ret[end:]
+	return ret
+
+
 def getCardValue(cardName, setCode):
     url = "http://www.mtggoldfish.com/widgets/autocard/%s [%s]" % (cardName, setCode)
     headers = {
@@ -185,8 +200,7 @@ class Messenger(object):
                 txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
             if "loyalty" in card:
                 txt += "\n*`%s`*" % card["loyalty"]
-            txt = txt.replace(u'{', ':')
-            txt = txt.replace(u'}', ':')
+            txt = emojiFilter(txt)
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
