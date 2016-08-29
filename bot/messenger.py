@@ -185,6 +185,8 @@ class Messenger(object):
                 txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
             if "loyalty" in card:
                 txt += "\n*`%s`*" % card["loyalty"]
+            txt = txt["text"].replace(u'{', ':')
+            txt = txt["text"].replace(u'}', ':')
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
