@@ -24,7 +24,6 @@ def emojiFilter(input):
 		start = lastpos + 2
 		end = ret.rfind("_:")
 		content = ret[start:end]
-		content = content.lower()
 		content = content.replace("/", "")
 		ret = ret[:start] + content + ret[end:]
 	return ret
