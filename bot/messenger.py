@@ -219,7 +219,7 @@ class Messenger(object):
             mostRecentPrinting = card["editions"][0]
             number = mostRecentPrinting["number"]
             if re.search('a|b', number):
-                if getCardset(mostRecentPrinting["set_id"])["border"] not "silver":
+                if not getCardset(mostRecentPrinting["set_id"])["border"] is "silver":
                 #TODO: traverse to other side / part of card, and add it to txt
                     if 'a' in number:
                         txt += "\n\nSee also card #%s." % number
