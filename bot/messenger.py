@@ -55,7 +55,6 @@ def getCardValue(cardName, setCode):
 
 def getCard(name):
     queryUrl = "http://api.deckbrew.com/mtg/cards?name=%s" % name
-    print queryUrl
     r = requests.get(queryUrl)
     cards = r.json()
 
@@ -75,7 +74,41 @@ def getCard(name):
     return card
 
 
+def getCardset(setCode):
+    # Returns information about the cardset's name, border and type
+    queryUrl = "http://api.deckbrew.com/mtg/sets/" % setCode.upper()
+    r = requests.get(queryUrl)
+    cardSet = r.json()
+
+    if len(cardSet) < 1:
+        return None
+    else:
+        return cardSet
+
+
+def getOracle(card):
+    typeline = ""
+    if "supertypes" in card:
+        for supertype in card["supertypes"]:
+            typeline += supertype.capitalize() + " "
+    if "types" in card:
+        for cardtype in card["types"]:
+            typeline += cardtype.capitalize() + " "
+        if "subtypes" in card:
+            typeline += "- "
+    if "subtypes" in card:
+        for subtype in card["subtypes"]:
+            typeline += subtype.capitalize() + " "
+    txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace(u'\u2212', '-'))
+    if "power" in card and "toughness" in card:
+        txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
+    if "loyalty" in card:
+        txt += "\n*`%s`*" % card["loyalty"]
+    return emojiFilter(txt)
+
+
 def getSeasons(dciNumber):
+    # Returns to current and last season for that DCI number
     url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
     headers = {
         'Pragma': 'no-cache',
@@ -182,24 +215,16 @@ class Messenger(object):
         card = getCard(searchTerm)
 
         if card:
-            typeline = ""
-            if "supertypes" in card:
-                for supertype in card["supertypes"]:
-                    typeline += supertype.capitalize() + " "
-            if "types" in card:
-                for cardtype in card["types"]:
-                    typeline += cardtype.capitalize() + " "
-                if "subtypes" in card:
-                    typeline += "- "
-            if "subtypes" in card:
-                for subtype in card["subtypes"]:
-                    typeline += subtype.capitalize() + " "
-            txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace(u'\u2212', '-'))
-            if "power" in card and "toughness" in card:
-                txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
-            if "loyalty" in card:
-                txt += "\n*`%s`*" % card["loyalty"]
-            txt = emojiFilter(txt)
+            txt = getOracle(card)
+            mostRecentPrinting = card["editions"][0]
+            number = mostRecentPrinting["number"]
+            if re.search('a|b', number):
+                if getCardset(mostRecentPrinting["set_id"])["border"] not "silver":
+                #TODO: traverse to other side / part of card, and add it to txt
+                    if 'a' in number:
+                        txt += "\n\nSee also card #%s." % number
+                    else:
+                        txt += "\n\nSee also card #%s." % number
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
