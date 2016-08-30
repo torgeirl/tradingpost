@@ -80,10 +80,10 @@ def getCardset(setCode):
     r = requests.get(queryUrl)
     cardSet = r.json()
 
-    if len(cardSet) < 1:
-        return None
-    else:
+    if len(cardSet) = 1:
         return cardSet
+    else:
+        return None
 
 
 def getOracle(card):
@@ -219,7 +219,8 @@ class Messenger(object):
             mostRecentPrinting = card["editions"][0]
             number = mostRecentPrinting["number"]
             if re.search('a|b', number):
-                if not getCardset(mostRecentPrinting["set_id"])["border"] == "silver":
+                cardSet = getCardset(mostRecentPrinting["set_id"])
+                if cardSet and cardSet["border"] != "silver":
                 #TODO: traverse to other side / part of card, and add it to txt
                     if 'a' in number:
                         txt += "\n\nSee also card #%s." % number
