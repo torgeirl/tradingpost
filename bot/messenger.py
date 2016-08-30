@@ -17,18 +17,18 @@ def findIndexOfSequence(data, sequence, startIndex=0):
 
 
 def emojiFilter(input):
-	ret = input.replace("{", ":_")
-	ret = ret.replace("}", "_:")
-	lastpos = None
-	while ret.rfind(":_", 0, lastpos) != -1:
-		lastpos = ret.rfind(":_", 0, lastpos)
-		start = lastpos + 2
-		end = ret.rfind("_:")
-		content = ret[start:end]
-                content = content.lower() #TODO: this lowers too much!
-		content = content.replace("/", "")
-		ret = ret[:start] + content + ret[end:]
-	return ret
+    ret = input.replace("{", ":_")
+    ret = ret.replace("}", "_:")
+    lastpos = None
+    while ret.rfind(":_", 0, lastpos) != -1:
+        lastpos = ret.rfind(":_", 0, lastpos)
+        start = lastpos + 2
+        end = ret.rfind("_:")
+        content = ret[start:end]
+        content = content.lower() #TODO: this lowers too much!
+        content = content.replace("/", "")
+        ret = ret[:start] + content + ret[end:]
+    return ret
 
 
 def getCardValue(cardName, setCode):
@@ -63,16 +63,14 @@ def getCard(name):
     if len(cards) < 1:
         return None
 
-    card = cards[0]
-    bestMatch = None
-    for cardIter in cards:
-        pos = cardIter["name"].lower().find(name)
-        if bestMatch is None or (pos != -1 and pos < bestMatch):
-            bestMatch = pos
-            card = cardIter
+    card = None
+    for element in cards:
+        if element["name"].lower() == name.lower():
+            card = element
 
-    mostRecent = card["editions"][0]
-    card["value"] = getCardValue(card["name"], mostRecent["set_id"])
+    if card:
+        mostRecent = card["editions"][0]
+        card["value"] = getCardValue(card["name"], mostRecent["set_id"])
     return card
 
 
@@ -221,7 +219,7 @@ class Messenger(object):
             mostRecentPrinting = card["editions"][0]
             number = mostRecentPrinting["number"]
             if re.search('a|b', number):
-                if not getCardset(mostRecentPrinting["set_id"])["border"] is "silver":
+                if not getCardset(mostRecentPrinting["set_id"])["border"] == "silver":
                 #TODO: traverse to other side / part of card, and add it to txt
                     if 'a' in number:
                         txt += "\n\nSee also card #%s." % number
