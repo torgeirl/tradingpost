@@ -74,8 +74,8 @@ def getCard(name):
     return card
 
 
-def getCardset(setCode):
-    # Returns information about the cardset's name, border and type
+def getCardSet(setCode):
+    # Returns information about the cardSet's name, border and type
     queryUrl = "http://api.deckbrew.com/mtg/sets/" % setCode.upper()
     r = requests.get(queryUrl)
     cardSet = r.json()
@@ -219,7 +219,7 @@ class Messenger(object):
             mostRecentPrinting = card["editions"][0]
             number = mostRecentPrinting["number"]
             if re.search('a|b', number):
-                cardSet = getCardset(mostRecentPrinting["set_id"])
+                cardSet = getCardSet(mostRecentPrinting["set_id"])
                 if cardSet and cardSet["border"] != "silver":
                 #TODO: traverse to other side / part of card, and add it to txt
                     if 'a' in number:
