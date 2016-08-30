@@ -74,39 +74,6 @@ def getCard(name):
     return card
 
 
-def getCardSet(setCode):
-    # Returns information about the cardSet's name, border and type
-    queryUrl = "http://api.deckbrew.com/mtg/sets/" % setCode.upper()
-    r = requests.get(queryUrl)
-    cardSet = r.json()
-
-    if len(cardSet) == 1:
-        return cardSet
-    else:
-        return None
-
-
-def getOracle(card):
-    typeline = ""
-    if "supertypes" in card:
-        for supertype in card["supertypes"]:
-            typeline += supertype.capitalize() + " "
-    if "types" in card:
-        for cardtype in card["types"]:
-            typeline += cardtype.capitalize() + " "
-        if "subtypes" in card:
-            typeline += "- "
-    if "subtypes" in card:
-        for subtype in card["subtypes"]:
-            typeline += subtype.capitalize() + " "
-    txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace(u'\u2212', '-'))
-    if "power" in card and "toughness" in card:
-        txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
-    if "loyalty" in card:
-        txt += "\n*`%s`*" % card["loyalty"]
-    return emojiFilter(txt)
-
-
 def getSeasons(dciNumber):
     # Returns to current and last season for that DCI number
     url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
@@ -153,6 +120,7 @@ class Messenger(object):
     def __init__(self, slack_clients):
         self.clients = slack_clients
 
+
     def send_message(self, channel_id, msg):
         # in the case of Group and Private channels, RTM channel payload is a complex dictionary
         if isinstance(channel_id, dict):
@@ -160,6 +128,7 @@ class Messenger(object):
         logger.debug('Sending msg: {} to channel: {}'.format(msg, channel_id))
         channel = self.clients.rtm.server.channels.find(channel_id)
         channel.send_message("{}".format(msg.encode('ascii', 'ignore')))
+
 
     def write_help_message(self, channel_id):
         bot_uid = self.clients.bot_user_id()
@@ -174,15 +143,18 @@ class Messenger(object):
             "> `!pwp dcinumber` - I'll tell you a player's PWP score and bye eligibility. :trophy:")
         self.send_message(channel_id, txt)
 
+
     def write_greeting(self, channel_id, user_id):
         greetings = ['Hi', 'Hello', 'Nice to meet you', 'Howdy', 'Salutations']
         txt = '{}, <@{}>!'.format(random.choice(greetings), user_id)
         self.send_message(channel_id, txt)
 
+
     def write_prompt(self, channel_id):
         bot_uid = self.clients.bot_user_id()
         txt = "I'm sorry, I didn't quite understand... Can I help you? (e.g. `<@" + bot_uid + "> help`)"
         self.send_message(channel_id, txt)
+
 
     def write_joke(self, channel_id):
         with open('/src/bot/jokes.json', 'r') as infile:
@@ -191,9 +163,11 @@ class Messenger(object):
         self.clients.send_user_typing_pause(channel_id)
         self.send_message(channel_id, joke["punchline"])
 
+
     def write_error(self, channel_id, err_msg):
         txt = ":face_with_head_bandage: my maker didn't handle this error very well:\n>```{}```".format(err_msg)
         self.send_message(channel_id, txt)
+
 
     def write_card(self, channel_id, searchTerm):
         card = getCard(searchTerm)
@@ -211,24 +185,33 @@ class Messenger(object):
             txt = 'Card not found.'
             self.send_message(channel_id, txt)
 
+
     def write_oracle(self, channel_id, searchTerm):
         card = getCard(searchTerm)
 
         if card:
-            txt = getOracle(card)
-            mostRecentPrinting = card["editions"][0]
-            number = mostRecentPrinting["number"]
-            if re.search('a|b', number):
-                cardSet = getCardSet(mostRecentPrinting["set_id"])
-                if cardSet and cardSet["border"] != "silver":
-                #TODO: traverse to other side / part of card, and add it to txt
-                    if 'a' in number:
-                        txt += "\n\nSee also card #%s." % number
-                    else:
-                        txt += "\n\nSee also card #%s." % number
+            typeline = ""
+            if "supertypes" in card:
+                for supertype in card["supertypes"]:
+                    typeline += supertype.capitalize() + " "
+            if "types" in card:
+                for cardtype in card["types"]:
+                    typeline += cardtype.capitalize() + " "
+                if "subtypes" in card:
+                    typeline += "- "
+            if "subtypes" in card:
+                for subtype in card["subtypes"]:
+                    typeline += subtype.capitalize() + " "
+            txt = "*%s %s*\n%s\n%s" % (card["name"], card["cost"], typeline, card["text"].replace(u'\u2212', '-'))
+            if "power" in card and "toughness" in card:
+                txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
+            if "loyalty" in card:
+                txt += "\n*`%s`*" % card["loyalty"]
+            txt = emojiFilter(txt)
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
+
 
     def write_price(self, channel_id, searchTerm):
         card = getCard(searchTerm)
@@ -242,6 +225,7 @@ class Messenger(object):
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
+
 
     def write_pwp(self, channel_id, dciNumber):
         planeswalker = getSeasons(dciNumber)
