@@ -80,7 +80,7 @@ def getCardSet(setCode):
     r = requests.get(queryUrl)
     cardSet = r.json()
 
-    if len(cardSet) = 1:
+    if len(cardSet) == 1:
         return cardSet
     else:
         return None
