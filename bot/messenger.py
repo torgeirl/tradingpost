@@ -170,7 +170,7 @@ class Messenger(object):
 
 
     def write_card(self, channel_id, searchTerm):
-        card = getCard(searchTerm)
+        card = getCard(searchTerm.strip())
 
         if card:
             mostRecentPrinting = card["editions"][0]
@@ -187,7 +187,7 @@ class Messenger(object):
 
 
     def write_oracle(self, channel_id, searchTerm):
-        card = getCard(searchTerm)
+        card = getCard(searchTerm.strip())
 
         if card:
             typeline = ""
@@ -214,7 +214,7 @@ class Messenger(object):
 
 
     def write_price(self, channel_id, searchTerm):
-        card = getCard(searchTerm)
+        card = getCard(searchTerm.strip())
 
         if card:
             mostRecentPrinting = card["editions"][0]
@@ -228,7 +228,7 @@ class Messenger(object):
 
 
     def write_pwp(self, channel_id, dciNumber):
-        planeswalker = getSeasons(dciNumber)
+        planeswalker = getSeasons(dciNumber.strip())
 
         if planeswalker:
             txt = ("DCI# %s has %s points in the current season, and %s points last season.\nCurrently "
