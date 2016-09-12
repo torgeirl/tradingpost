@@ -70,10 +70,6 @@ def get_card(name):
     for element in cards:
         if element["name"].lower() == name.lower():
             card = element
-
-    if card:
-        most_recent = card["editions"][0]
-        card["value"] = get_card_value(card["name"], most_recent["set_id"])
     return card
 
 
@@ -221,6 +217,7 @@ class Messenger(object):
 
         if card:
             most_recent_printing = card["editions"][0]
+            card["value"] = get_card_value(card["name"], most_recent_printing["set_id"])
             txt = "Unable to find price information for %s" % card["name"]
             if card["value"] > 0:
                 txt = ("Current market price for most recent printing of %s (%s) - $%.1f" %
