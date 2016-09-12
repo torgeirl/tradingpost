@@ -58,7 +58,11 @@ def getCardValue(cardName, setCode):
 def getCard(name):
     queryUrl = "http://api.deckbrew.com/mtg/cards?name=%s" % name
     r = requests.get(queryUrl)
-    cards = r.json()
+    try:
+        cards = r.json()
+    except ValueError:
+        logging.error(u'No JSON object could be decoded from API response: %s' % r)
+        return None
 
     if len(cards) < 1:
         return None
