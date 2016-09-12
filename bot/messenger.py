@@ -7,8 +7,8 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-def findIndexOfSequence(data, sequence, startIndex=0):
-    index = startIndex
+def find_index_of_sequence(data, sequence, start_index=0):
+    index = start_index
     for token in sequence:
         index = data.find(token, index)
         if index == -1:
@@ -16,7 +16,7 @@ def findIndexOfSequence(data, sequence, startIndex=0):
     return index + len(sequence[-1])
 
 
-def emojiFilter(input):
+def emoji_filter(input):
     ret = input.replace("{", ":_")
     ret = ret.replace("}", "_:")
     lastpos = None
@@ -31,33 +31,32 @@ def emojiFilter(input):
     return ret
 
 
-def getCardValue(cardName, setCode):
-    url = "http://www.mtggoldfish.com/widgets/autocard/%s [%s]" % (cardName, setCode)
+def get_card_value(card_name, set_code):
+    url = "http://www.mtggoldfish.com/widgets/autocard/%s [%s]" % (card_name, set_code)
     headers = {
         'Pragma': 'no-cache',
         'Accept-Encoding': 'gzip, deflate, sdch',
         'Accept-Language': 'en-US,en;q=0.8,de;q=0.6,sv;q=0.4',
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36',
         'Accept': 'text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01',
-        'Referer': 'http://www.mtggoldfish.com/widgets/autocard/%s' % cardName,
+        'Referer': 'http://www.mtggoldfish.com/widgets/autocard/%s' % card_name,
         'X-Requested-With': 'XMLHttpRequest',
         'Connection': 'keep-alive',
         'Cache-Control': 'no-cache'
     }
     response = requests.get(url, headers=headers)
-    index = findIndexOfSequence(response.content, ["tcgplayer", "btn-shop-price", "$"])
-    endIndex = response.content.find("\\n", index)
+    index = find_index_of_sequence(response.content, ["tcgplayer", "btn-shop-price", "$"])
+    end_index = response.content.find("\\n", index)
     try:
-        value = float(response.content[index + 2:endIndex].replace(",", ""))
+        value = float(response.content[index + 2:end_index].replace(",", ""))
     except ValueError:
         value = 0
-
     return value
 
 
-def getCard(name):
-    queryUrl = "http://api.deckbrew.com/mtg/cards?name=%s" % name
-    r = requests.get(queryUrl)
+def get_card(name):
+    query_url = "http://api.deckbrew.com/mtg/cards?name=%s" % name
+    r = requests.get(query_url)
     try:
         cards = r.json()
     except ValueError:
@@ -73,13 +72,13 @@ def getCard(name):
             card = element
 
     if card:
-        mostRecent = card["editions"][0]
-        card["value"] = getCardValue(card["name"], mostRecent["set_id"])
+        most_recent = card["editions"][0]
+        card["value"] = get_card_value(card["name"], most_recent["set_id"])
     return card
 
 
-def getSeasons(dciNumber):
-    # Returns to current and last season for that DCI number
+def get_seasons(dci_number):
+    '''Returns to current and last season for that DCI number'''
     url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
     headers = {
         'Pragma': 'no-cache',
@@ -93,27 +92,27 @@ def getSeasons(dciNumber):
         'X-Requested-With': 'XMLHttpRequest',
         'Cookie': 'f5_cspm=1234; BIGipServerWWWPWPPOOL01=353569034.20480.0000; __utmt=1; BIGipServerWWWPool1=3792701706.20480.0000; PlaneswalkerPointsSettings=0=0&lastviewed=9212399887; __utma=75931667.1475261136.1456488297.1456488297.1456488297.1; __utmb=75931667.5.10.1456488297; __utmc=75931667; __utmz=75931667.1456488297.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)',
         'Connection': 'keep-alive',
-        'Referer': 'http://www.wizards.com/Magic/PlaneswalkerPoints/%s' % dciNumber
+        'Referer': 'http://www.wizards.com/Magic/PlaneswalkerPoints/%s' % dci_number
     }
-    data = {"Parameters": {"DCINumber": dciNumber, "SelectedType": "Yearly"}}
+    data = {"Parameters": {"DCINumber": dci_number, "SelectedType": "Yearly"}}
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     if response.status_code is 200:
         seasons = []
 
-        responseData = json.loads(response.content)
-        markup = responseData["ModalContent"]
-        searchPosition = markup.find("SeasonRange")
+        response_data = json.loads(response.content)
+        markup = response_data["ModalContent"]
+        search_position = markup.find("SeasonRange")
 
-        while searchPosition != -1:
+        while search_position != -1:
             pointsvalue = "PointsValue\">"
-            searchPosition = markup.find(pointsvalue, searchPosition)
-            searchPosition += len(pointsvalue)
-            endPosition = markup.find("</div>", searchPosition)
-            if endPosition != -1:
-                value = markup[searchPosition:endPosition]
+            search_position = markup.find(pointsvalue, search_position)
+            search_position += len(pointsvalue)
+            end_position = markup.find("</div>", search_position)
+            if end_position != -1:
+                value = markup[search_position:end_position]
                 seasons.append(int(value))
-            searchPosition = markup.find("SeasonRange", searchPosition)
+            search_position = markup.find("SeasonRange", search_position)
 
         return {"currentSeason": seasons[0], "lastSeason": seasons[1]}
     else:
@@ -173,16 +172,16 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
 
-    def write_card(self, channel_id, searchTerm):
-        card = getCard(searchTerm)
+    def write_card(self, channel_id, search_term):
+        card = get_card(search_term)
 
         if card:
-            mostRecentPrinting = card["editions"][0]
+            most_recent_printing = card["editions"][0]
             txt = ""
             attachment = {
                 "title": card["name"].replace("\"", "\\\""),
-                "image_url": mostRecentPrinting["image_url"],
-                "footer": "%s (%s)" % (mostRecentPrinting["set"], mostRecentPrinting["set_id"]),
+                "image_url": most_recent_printing["image_url"],
+                "footer": "%s (%s)" % (most_recent_printing["set"], most_recent_printing["set_id"]),
             }
             self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
         else:
@@ -190,8 +189,8 @@ class Messenger(object):
             self.send_message(channel_id, txt)
 
 
-    def write_oracle(self, channel_id, searchTerm):
-        card = getCard(searchTerm)
+    def write_oracle(self, channel_id, search_term):
+        card = get_card(search_term)
 
         if card:
             typeline = ""
@@ -211,32 +210,32 @@ class Messenger(object):
                 txt += "\n*`%s/%s`*" % (card["power"], card["toughness"])
             if "loyalty" in card:
                 txt += "\n*`%s`*" % card["loyalty"]
-            txt = emojiFilter(txt)
+            txt = emoji_filter(txt)
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
 
 
-    def write_price(self, channel_id, searchTerm):
-        card = getCard(searchTerm)
+    def write_price(self, channel_id, search_term):
+        card = get_card(search_term)
 
         if card:
-            mostRecentPrinting = card["editions"][0]
+            most_recent_printing = card["editions"][0]
             txt = "Unable to find price information for %s" % card["name"]
             if card["value"] > 0:
                 txt = ("Current market price for most recent printing of %s (%s) - $%.1f" %
-                       (card["name"], mostRecentPrinting["set"], card["value"]))
+                       (card["name"], most_recent_printing["set"], card["value"]))
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
 
 
-    def write_pwp(self, channel_id, dciNumber):
-        planeswalker = getSeasons(dciNumber)
+    def write_pwp(self, channel_id, dci_number):
+        planeswalker = get_seasons(dci_number)
 
         if planeswalker:
             txt = ("DCI# %s has %s points in the current season, and %s points last season.\nCurrently "
-                   % (dciNumber, planeswalker["currentSeason"], planeswalker["lastSeason"]))
+                   % (dci_number, planeswalker["currentSeason"], planeswalker["lastSeason"]))
 
             if planeswalker["currentSeason"] >= 2250 or planeswalker["lastSeason"] >= 2250:
                 txt += "eligible for 2 GP byes."
@@ -245,5 +244,5 @@ class Messenger(object):
             else:
                 txt += "not eligible for GP byes."
         else:
-            txt = "DCI# %s not found." % dciNumber
+            txt = "DCI# %s not found." % dci_number
         self.send_message(channel_id, txt)
