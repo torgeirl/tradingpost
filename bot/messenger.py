@@ -17,22 +17,22 @@ def find_index_of_sequence(data, sequence, start_index=0):
 
 
 def emoji_filter(input):
-    ret = input.replace("{", ":_")
-    ret = ret.replace("}", "_:")
+    ret = input.replace('{', ':_')
+    ret = ret.replace('}', '_:')
     lastpos = None
-    while ret.rfind("_:", 0, lastpos) != -1:
-        end = ret.rfind("_:", 0, lastpos)
-        lastpos = ret.rfind(":_", 0, lastpos)
+    while ret.rfind('_:', 0, lastpos) != -1:
+        end = ret.rfind('_:', 0, lastpos)
+        lastpos = ret.rfind(':_', 0, lastpos)
         start = lastpos + 2
         content = ret[start:end]
         content = content.lower()
-        content = content.replace("/", "")
+        content = content.replace('/', '')
         ret = ret[:start] + content + ret[end:]
     return ret
 
 
 def get_card_value(card_name, set_code):
-    url = "http://www.mtggoldfish.com/widgets/autocard/%s [%s]" % (card_name, set_code)
+    url = 'http://www.mtggoldfish.com/widgets/autocard/%s [%s]' % (card_name, set_code)
     headers = {
         'Pragma': 'no-cache',
         'Accept-Encoding': 'gzip, deflate, sdch',
@@ -45,17 +45,17 @@ def get_card_value(card_name, set_code):
         'Cache-Control': 'no-cache'
     }
     response = requests.get(url, headers=headers)
-    index = find_index_of_sequence(response.content, ["tcgplayer", "btn-shop-price", "$"])
-    end_index = response.content.find("\\n", index)
+    index = find_index_of_sequence(response.content, ['tcgplayer', 'btn-shop-price', '$'])
+    end_index = response.content.find('\\n', index)
     try:
-        value = float(response.content[index + 2:end_index].replace(",", ""))
+        value = float(response.content[index + 2:end_index].replace(',', ''))
     except ValueError:
         value = 0
     return value
 
 
 def get_card(name):
-    query_url = "http://api.deckbrew.com/mtg/cards?name=%s" % name
+    query_url = 'http://api.deckbrew.com/mtg/cards?name=%s' % name
     r = requests.get(query_url)
     try:
         cards = r.json()
@@ -68,14 +68,14 @@ def get_card(name):
 
     card = None
     for element in cards:
-        if element["name"].lower() == name.lower():
+        if element['name'].lower() == name.lower():
             card = element
     return card
 
 
 def get_seasons(dci_number):
     '''Returns to current and last season for that DCI number'''
-    url = "http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal"
+    url = 'http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistoryModal'
     headers = {
         'Pragma': 'no-cache',
         'Origin': 'http://www.wizards.com',
@@ -90,27 +90,27 @@ def get_seasons(dci_number):
         'Connection': 'keep-alive',
         'Referer': 'http://www.wizards.com/Magic/PlaneswalkerPoints/%s' % dci_number
     }
-    data = {"Parameters": {"DCINumber": dci_number, "SelectedType": "Yearly"}}
+    data = {'Parameters': {'DCINumber': dci_number, 'SelectedType': 'Yearly'}}
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     if response.status_code is 200:
         seasons = []
 
         response_data = json.loads(response.content)
-        markup = response_data["ModalContent"]
-        search_position = markup.find("SeasonRange")
+        markup = response_data['ModalContent']
+        search_position = markup.find('SeasonRange')
 
         while search_position != -1:
-            pointsvalue = "PointsValue\">"
+            pointsvalue = 'PointsValue\">'
             search_position = markup.find(pointsvalue, search_position)
             search_position += len(pointsvalue)
-            end_position = markup.find("</div>", search_position)
+            end_position = markup.find('</div>', search_position)
             if end_position != -1:
                 value = markup[search_position:end_position]
                 seasons.append(int(value))
-            search_position = markup.find("SeasonRange", search_position)
+            search_position = markup.find('SeasonRange', search_position)
 
-        return {"currentSeason": seasons[0], "lastSeason": seasons[1]}
+        return {'currentSeason': seasons[0], 'lastSeason': seasons[1]}
     else:
         return None
 
@@ -126,20 +126,20 @@ class Messenger(object):
             channel_id = channel_id['id']
         logger.debug('Sending msg: {} to channel: {}'.format(msg, channel_id))
         channel = self.clients.rtm.server.channels.find(channel_id)
-        channel.send_message("{}".format(msg.encode('ascii', 'ignore')))
+        channel.send_message('{}'.format(msg.encode('ascii', 'ignore')))
 
 
     def write_help_message(self, channel_id):
         bot_uid = self.clients.bot_user_id()
         txt = '{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(
-            "I'm your friendly Slack bot written in Python.  I'll *_respond_* to the following commands:",
-            "> `hi <@" + bot_uid + ">` - I'll respond with a randomized greeting mentioning your username. :wave:",
-            "> `<@" + bot_uid + "> joke` - I'll tell you one of my finest jokes, with a typing pause for effect. :laughing:",
-            "> `<@" + bot_uid + "> help` - I'll reply with this helpful text. :information_source:",
-            "> `!card cardname` - I'll post a picture of the named card. :frame_with_picture:",
-            "> `!price cardname` - I'll respond with the card's current market price. :moneybag:",
-            "> `!oracle cardname` - I'll respond with the card's oracle text. :book:",
-            "> `!pwp dcinumber` - I'll tell you a player's PWP score and bye eligibility. :trophy:")
+            'I\'m your friendly Slack bot written in Python.  I\'ll *_respond_* to the following commands:',
+            '> `hi <@' + bot_uid + '>` - I\'ll respond with a randomized greeting mentioning your username. :wave:',
+            '> `<@' + bot_uid + '> joke` - I\'ll tell you one of my finest jokes, with a typing pause for effect. :laughing:',
+            '> `<@' + bot_uid + '> help` - I\'ll reply with this helpful text. :information_source:',
+            '> `!card cardname` - I\'ll post a picture of the named card. :frame_with_picture:',
+            '> `!price cardname` - I\'ll respond with the card\'s current market price. :moneybag:',
+            '> `!oracle cardname` - I\'ll respond with the card\'s oracle text. :book:',
+            '> `!pwp dcinumber` - I\'ll tell you a player\'s PWP score and bye eligibility. :trophy:')
         self.send_message(channel_id, txt)
 
 
@@ -151,20 +151,20 @@ class Messenger(object):
 
     def write_prompt(self, channel_id):
         bot_uid = self.clients.bot_user_id()
-        txt = "I'm sorry, I didn't quite understand... Can I help you? (e.g. `<@" + bot_uid + "> help`)"
+        txt = 'I\'m sorry, I didn\'t quite understand... Can I help you? (e.g. `<@' + bot_uid + '> help`)'
         self.send_message(channel_id, txt)
 
 
     def write_joke(self, channel_id):
         with open('/src/bot/jokes.json', 'r') as infile:
             joke = random.choice(json.load(infile))
-        self.send_message(channel_id, joke["setup"])
+        self.send_message(channel_id, joke['setup'])
         self.clients.send_user_typing_pause(channel_id)
-        self.send_message(channel_id, joke["punchline"])
+        self.send_message(channel_id, joke['punchline'])
 
 
     def write_error(self, channel_id, err_msg):
-        txt = ":face_with_head_bandage: my maker didn't handle this error very well:\n>```{}```".format(err_msg)
+        txt = ':face_with_head_bandage: my maker didn\'t handle this error very well:\n>```{}```'.format(err_msg)
         self.send_message(channel_id, txt)
 
 
@@ -172,12 +172,12 @@ class Messenger(object):
         card = get_card(search_term)
 
         if card:
-            most_recent_printing = card["editions"][0]
-            txt = ""
+            most_recent_printing = card['editions'][0]
+            txt = ''
             attachment = {
-                "title": card["name"].replace("\"", "\\\""),
-                "image_url": most_recent_printing["image_url"],
-                "footer": "%s (%s)" % (most_recent_printing["set"], most_recent_printing["set_id"]),
+                'title': card['name'].replace('\'', '\\\''),
+                'image_url': most_recent_printing['image_url'],
+                'footer': '%s (%s)' % (most_recent_printing['set'], most_recent_printing['set_id']),
             }
             self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
         else:
@@ -189,23 +189,23 @@ class Messenger(object):
         card = get_card(search_term)
 
         if card:
-            typeline = ""
-            if "supertypes" in card:
-                for supertype in card["supertypes"]:
-                    typeline += supertype.capitalize() + " "
-            if "types" in card:
-                for cardtype in card["types"]:
-                    typeline += cardtype.capitalize() + " "
-                if "subtypes" in card:
-                    typeline += "- "
-            if "subtypes" in card:
-                for subtype in card["subtypes"]:
-                    typeline += subtype.capitalize() + " "
-            txt = u'*%s %s*\n%s\n%s' % (card["name"], card["cost"], typeline, card["text"].replace(u'\u2212', '-').replace(u'\u2014', '-')) #.replace(u'\u2022', '*'))
-            if "power" in card and "toughness" in card:
-                txt += u'\n*`%s/%s`*' % (card["power"], card["toughness"])
-            if "loyalty" in card:
-                txt += u'\n*`%s`*' % card["loyalty"]
+            typeline = ''
+            if 'supertypes' in card:
+                for supertype in card['supertypes']:
+                    typeline += supertype.capitalize() + ' '
+            if 'types' in card:
+                for cardtype in card['types']:
+                    typeline += cardtype.capitalize() + ' '
+                if 'subtypes' in card:
+                    typeline += '- '
+            if 'subtypes' in card:
+                for subtype in card['subtypes']:
+                    typeline += subtype.capitalize() + ' '
+            txt = u'*%s %s*\n%s\n%s' % (card['name'], card['cost'], typeline, card['text'].replace(u'\u2212', '-').replace(u'\u2014', '-').replace(u'\u2022', '*'))
+            if 'power' in card and 'toughness' in card:
+                txt += u'\n*`%s/%s`*' % (card['power'], card['toughness'])
+            if 'loyalty' in card:
+                txt += u'\n*`%s`*' % card['loyalty']
             txt = emoji_filter(txt)
         else:
             txt = 'Card not found.'
@@ -216,12 +216,12 @@ class Messenger(object):
         card = get_card(search_term)
 
         if card:
-            most_recent_printing = card["editions"][0]
-            card["value"] = get_card_value(card["name"], most_recent_printing["set_id"])
-            txt = "Unable to find price information for %s" % card["name"]
-            if card["value"] > 0:
-                txt = ("Current market price for most recent printing of %s (%s) - $%.1f" %
-                       (card["name"], most_recent_printing["set"], card["value"]))
+            most_recent_printing = card['editions'][0]
+            card['value'] = get_card_value(card['name'], most_recent_printing['set_id'])
+            txt = 'Unable to find price information for %s' % card['name']
+            if card['value'] > 0:
+                txt = ('Current market price for most recent printing of %s (%s) - $%.1f' %
+                       (card['name'], most_recent_printing['set'], card['value']))
         else:
             txt = 'Card not found.'
         self.send_message(channel_id, txt)
@@ -231,15 +231,15 @@ class Messenger(object):
         planeswalker = get_seasons(dci_number)
 
         if planeswalker:
-            txt = ("DCI# %s has %s points in the current season, and %s points last season.\nCurrently "
-                   % (dci_number, planeswalker["currentSeason"], planeswalker["lastSeason"]))
+            txt = ('DCI# %s has %s points in the current season, and %s points last season.\nCurrently '
+                   % (dci_number, planeswalker['currentSeason'], planeswalker['lastSeason']))
 
-            if planeswalker["currentSeason"] >= 2250 or planeswalker["lastSeason"] >= 2250:
-                txt += "eligible for 2 GP byes."
-            elif planeswalker["currentSeason"] >= 1300 or planeswalker["lastSeason"] >= 1300:
-                txt += "eligible for 1 GP bye."
+            if planeswalker['currentSeason'] >= 2250 or planeswalker['lastSeason'] >= 2250:
+                txt += 'eligible for 2 GP byes.'
+            elif planeswalker['currentSeason'] >= 1300 or planeswalker['lastSeason'] >= 1300:
+                txt += 'eligible for 1 GP bye.'
             else:
-                txt += "not eligible for GP byes."
+                txt += 'not eligible for GP byes.'
         else:
-            txt = "DCI# %s not found." % dci_number
+            txt = 'DCI# %s not found.' % dci_number
         self.send_message(channel_id, txt)
