@@ -35,7 +35,7 @@ class RtmEventHandler(object):
         # filter out messages from the bot itself, and from non-users (eg. webhooks)
         if ('user' in event) and (not self.clients.is_message_from_me(event['user'])):
 
-            msg_txt = event['text']
+            msg_txt = event['text'].lower()
 
             if self.clients.is_bot_mention(msg_txt):
                 # e.g. user typed: "@pybot tell me a joke!"
