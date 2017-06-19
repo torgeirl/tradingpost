@@ -112,7 +112,10 @@ def get_seasons(dci_number):
                 seasons.append(int(value))
             search_position = markup.find('SeasonRange', search_position)
 
-        return {'currentSeason': seasons[0], 'lastSeason': seasons[1]}
+        try:
+            return {'currentSeason': seasons[0], 'lastSeason': seasons[1]}
+        except IndexError:
+            return None
     else:
         return None
 
