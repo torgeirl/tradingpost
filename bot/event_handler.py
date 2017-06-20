@@ -1,6 +1,6 @@
 import json
 import logging
-import re
+from re import search
 
 logger = logging.getLogger(__name__)
 
@@ -37,17 +37,17 @@ class RtmEventHandler(object):
 
             msg_txt = event['text'].lower()
 
-            if self.clients.is_bot_mention(msg_txt):
+            if self.clients.is_bot_mention(event['text']):
                 # e.g. user typed: "@pybot tell me a joke!"
-                if 'help' in msg_txt:
+                if search('help', msg_txt):
                     self.msg_writer.write_help_message(event['channel'])
-                elif re.search('hi|hey|hello|howdy', msg_txt):
-                    self.msg_writer.write_greeting(event['channel'], event['user'])
-                elif 'joke' in msg_txt:
+                elif search('joke', msg_txt):
                     self.msg_writer.write_joke(event['channel'])
+                elif search('hi|hey|hello|howdy', msg_txt):
+                    self.msg_writer.write_greeting(event['channel'], event['user'])
                 else:
                     self.msg_writer.write_prompt(event['channel'])
-            elif re.search('!card|!oracle|!price|!pwp', msg_txt):
+            elif search('!card|!oracle|!price|!pwp', msg_txt):
                 if msg_txt.startswith('!card '):
                     self.msg_writer.write_card(event['channel'], msg_txt[5:].strip())
                 elif msg_txt.startswith('!oracle '):
