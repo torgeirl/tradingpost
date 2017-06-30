@@ -98,26 +98,29 @@ def get_seasons(dci_number):
     if response.status_code is 200:
         seasons = []
 
-        response_data = json.loads(response.content)
-        markup = response_data['ModalContent']
-        search_position = markup.find('SeasonRange')
+        try:
+            response_data = json.loads(response.content)
+            markup = response_data['ModalContent']
+            search_position = markup.find('SeasonRange')
 
-        while search_position != -1:
-            pointsvalue = 'PointsValue\">'
-            search_position = markup.find(pointsvalue, search_position)
-            search_position += len(pointsvalue)
-            end_position = markup.find('</div>', search_position)
-            if end_position != -1:
-                value = markup[search_position:end_position]
-                seasons.append(int(value))
-            search_position = markup.find('SeasonRange', search_position)
+            while search_position != -1:
+                pointsvalue = 'PointsValue\">'
+                search_position = markup.find(pointsvalue, search_position)
+                search_position += len(pointsvalue)
+                end_position = markup.find('</div>', search_position)
+                if end_position != -1:
+                    value = markup[search_position:end_position]
+                    seasons.append(int(value))
+                search_position = markup.find('SeasonRange', search_position)
+        except ValueError:
+            return 'Garbled response from backend. Please try again later.'
 
         try:
             return {'currentSeason': seasons[0], 'lastSeason': seasons[1]}
         except IndexError:
-            return None
+            return 'DCI# %s not found.' % dci_number
     else:
-        return None
+        return 'No response from backend. Please try again later.'
 
 
 class Messenger(object):
@@ -233,18 +236,18 @@ class Messenger(object):
 
 
     def write_pwp(self, channel_id, dci_number):
-        planeswalker = get_seasons(dci_number)
+        response = get_seasons(dci_number)
 
-        if planeswalker:
+        if isinstance(response, dict):
             txt = ('DCI# %s has %s points in the current season, and %s points last season.\nCurrently '
-                   % (dci_number, planeswalker['currentSeason'], planeswalker['lastSeason']))
+                   % (dci_number, response['currentSeason'], response['lastSeason']))
 
-            if planeswalker['currentSeason'] >= 2250 or planeswalker['lastSeason'] >= 2250:
+            if response['currentSeason'] >= 2250 or response['lastSeason'] >= 2250:
                 txt += 'eligible for 2 GP byes.'
-            elif planeswalker['currentSeason'] >= 1300 or planeswalker['lastSeason'] >= 1300:
+            elif response['currentSeason'] >= 1300 or response['lastSeason'] >= 1300:
                 txt += 'eligible for 1 GP bye.'
             else:
                 txt += 'not eligible for GP byes.'
         else:
-            txt = 'DCI# %s not found.' % dci_number
+            txt = response
         self.send_message(channel_id, txt)
