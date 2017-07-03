@@ -113,6 +113,7 @@ def get_seasons(dci_number):
                     seasons.append(int(value))
                 search_position = markup.find('SeasonRange', search_position)
         except ValueError:
+            logging.error(u'No JSON object could be decoded from API response: %s' % response)
             return 'Garbled response from backend. Please try again later.'
 
         try:
@@ -120,6 +121,7 @@ def get_seasons(dci_number):
         except IndexError:
             return 'DCI# %s not found.' % dci_number
     else:
+        logging.error(u'No response from API (HTTP code %i)' % response.status_code)
         return 'No response from backend. Please try again later.'
 
 
@@ -236,18 +238,21 @@ class Messenger(object):
 
 
     def write_pwp(self, channel_id, dci_number):
-        response = get_seasons(dci_number)
+        if dci_number.isdigit():
+            response = get_seasons(dci_number)
 
-        if isinstance(response, dict):
-            txt = ('DCI# %s has %s points in the current season, and %s points last season.\nCurrently '
-                   % (dci_number, response['currentSeason'], response['lastSeason']))
+            if isinstance(response, dict):
+                txt = ('DCI# %s has %s points in the current season, and %s points last season.\nCurrently '
+                       % (dci_number, response['currentSeason'], response['lastSeason']))
 
-            if response['currentSeason'] >= 2250 or response['lastSeason'] >= 2250:
-                txt += 'eligible for 2 GP byes.'
-            elif response['currentSeason'] >= 1300 or response['lastSeason'] >= 1300:
-                txt += 'eligible for 1 GP bye.'
+                if response['currentSeason'] >= 2250 or response['lastSeason'] >= 2250:
+                    txt += 'eligible for 2 GP byes.'
+                elif response['currentSeason'] >= 1300 or response['lastSeason'] >= 1300:
+                    txt += 'eligible for 1 GP bye.'
+                else:
+                    txt += 'not eligible for GP byes.'
             else:
-                txt += 'not eligible for GP byes.'
+                txt = response
         else:
-            txt = response
+            txt = '\'%s\' doesn\'t look like a DCI number. Try again, but with an actual number.' % dci_number
         self.send_message(channel_id, txt)
