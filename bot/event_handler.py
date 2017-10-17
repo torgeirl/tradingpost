@@ -47,7 +47,7 @@ class RtmEventHandler(object):
                     self.msg_writer.write_greeting(event['channel'], event['user'])
                 else:
                     self.msg_writer.write_prompt(event['channel'])
-            elif search('!card|!oracle|!price|!pwp', msg_txt):
+            elif search('!card|!oracle|!price|!pwp|!roll', msg_txt):
                 if msg_txt.startswith('!card '):
                     self.msg_writer.write_card(event['channel'], msg_txt[5:].strip())
                 elif msg_txt.startswith('!oracle '):
@@ -56,5 +56,8 @@ class RtmEventHandler(object):
                     self.msg_writer.write_price(event['channel'], msg_txt[6:].strip())
                 elif msg_txt.startswith('!pwp '):
                     self.msg_writer.write_pwp(event['channel'], msg_txt[4:].strip())
+                elif msg_txt.startswith('!roll'):
+                    sides = msg_txt[5:].strip()
+                    self.msg_writer.write_roll(event['channel'], sides)
             else:
                 pass

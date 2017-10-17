@@ -256,3 +256,21 @@ class Messenger(object):
         else:
             txt = '\'%s\' doesn\'t look like a DCI number. Try again, but with an actual number.' % dci_number
         self.send_message(channel_id, txt)
+
+    def write_roll(self, channel_id, sides):
+        if sides == '':
+            sides = 6
+
+        try:
+            sides = int(sides)
+        except ValueError:
+            self.send_message('Please supply a valid number of sides.')
+            return
+
+        intro = 'Rolled a {}-sided die, and the results is...'
+        result = '{}! :game_die: :game_die:'.format(random.randint(1, sides))
+
+        self.send_message(channel_id, intro.format(sides))
+        self.clients.send_user_typing_pause(channel_id)
+        self.send_message(channel_id, result)
+
