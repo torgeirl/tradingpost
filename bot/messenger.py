@@ -149,7 +149,9 @@ class Messenger(object):
             '> `!card cardname` - I\'ll post a picture of the named card. :frame_with_picture:',
             '> `!price cardname` - I\'ll respond with the card\'s current market price. :moneybag:',
             '> `!oracle cardname` - I\'ll respond with the card\'s oracle text. :book:',
-            '> `!pwp dcinumber` - I\'ll tell you a player\'s PWP score and bye eligibility. :trophy:')
+            '> `!pwp dcinumber` - I\'ll tell you a player\'s PWP score and bye eligibility. :trophy:',
+            '> `!roll sides` - Indecisive? I\'ll roll a die for you (default sides: 6)! :game_die:')
+
         self.send_message(channel_id, txt)
 
 
@@ -273,4 +275,3 @@ class Messenger(object):
         self.send_message(channel_id, intro.format(sides))
         self.clients.send_user_typing_pause(channel_id)
         self.send_message(channel_id, result)
-

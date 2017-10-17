@@ -56,8 +56,7 @@ class RtmEventHandler(object):
                     self.msg_writer.write_price(event['channel'], msg_txt[6:].strip())
                 elif msg_txt.startswith('!pwp '):
                     self.msg_writer.write_pwp(event['channel'], msg_txt[4:].strip())
-                elif msg_txt.startswith('!roll'):
-                    sides = msg_txt[5:].strip()
-                    self.msg_writer.write_roll(event['channel'], sides)
+                elif msg_txt.startswith('!roll '):
+                    self.msg_writer.write_roll(event['channel'], msg_txt[5:].strip())
             else:
                 pass
