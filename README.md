@@ -23,12 +23,13 @@ Things are looking good if the console prints something like:
 If you want change the logging level, prepend `export LOG_LEVEL=<your level>; ` to the `python ./bot/app.py` command.
 
 ### Run locally in Docker
-	docker build -t starter-python-bot .
-	docker run --rm -it -e SLACK_TOKEN=<YOUR SLACK API TOKEN> starter-python-bot
+	sudo docker build -t tradingpost-beepboop .
+	sudo docker run -d --restart=on-failure:10 -e "SLACK_TOKEN=<YOUR SLACK API TOKEN>" tradingpost-beepboop
+
+Make sure all files are owned by root. For other restart policies, see [Docker's documentation](https://docs.docker.com/engine/reference/run/#restart-policies-restart).
 
 ### Run in BeepBoop
 If you have linked your local repo with the Beep Boop service (check [here](https://beepboophq.com/0_o/my-projects)), changes pushed to the remote master branch will automatically deploy.
-
 
 ## Credits
 I got the inspiration to make Tradingpost after seeing Filip Söderholm's [cardfetcher bot](https://github.com/fiso/cardfetcher) in action, and I have re-used part of his code while making Tradingpost.
