@@ -1,6 +1,9 @@
 tradingpost-beepboop
 =============
 
+**Warning:** Beep Boop was [shut down December 31, 2017](https://blog.beepboophq.com/the-final-chapter-of-beep-boop-efab4f351a51), and this repository is no longer maintained. See [tradingpost-errbot](https://github.com/torgeirl/tradingpost-errbot) for an [errbot](http://errbot.io) port.
+</aside>
+
 ## Overview
 A simple Magic: the Gathering bot, implemented to be a Beep Boop hostable, Python-based Slack bot.
 
